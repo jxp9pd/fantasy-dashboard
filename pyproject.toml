@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "fantasy-dashboard-pipeline"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["duckdb>=1.2,<2", "certifi>=2025.1"]
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+[tool.setuptools]
+packages = ["pipeline"]
+[tool.pytest.ini_options]
+addopts = "-m 'not realdata'"
+markers = ["realdata: opt-in checks against downloaded current-season sources"]
