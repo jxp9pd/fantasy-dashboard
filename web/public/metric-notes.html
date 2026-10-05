@@ -1,34 +1,411 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Fantasy football metric notes</title><style>
-:root {font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#182923;background:#f5f7f4;line-height:1.7}body{max-width:760px;margin:0 auto;padding:40px 24px 72px}a{color:#145e49}h1{font-size:2rem;line-height:1.2}h2{margin-top:2.5rem;font-size:1.3rem}li{margin:.8rem 0}a:focus-visible{outline:3px solid #145e49;outline-offset:4px}header{margin-bottom:32px}footer{margin-top:48px;border-top:1px solid #ccd5cf;padding-top:24px;font-size:.9rem}
-</style></head><body><header><a href="./">← Back to dashboard</a></header><main><h1>Fantasy football metric notes</h1>
-<p>Short reading notes for the half-PPR WR and RB season dashboards. Route-based metrics are unavailable from the free data sources used in this version.</p>
-<h2>Shared scoring measures</h2>
-<ul>
-<li><strong>Points/game:</strong> Who has produced when playing? Touchdowns can move this sharply, so inspect the workload underneath.</li>
-<li><strong>Expected points/game (xFP):</strong> How valuable were the opportunities received? This describes past workload, not next-week projected scoring. A gap versus actual points can reflect conversion, skill, offensive context, or noise; it is not an automatic buy/sell signal.</li>
-</ul>
-<h2>Wide receivers</h2>
-<ul>
-<li><strong>Targets/game:</strong> How much receiving volume is available before catches happen?</li>
-<li><strong>Target share:</strong> How central is the player to the passing offense? Pair it with targets/game because teams throw at different rates.</li>
-<li><strong>Route participation:</strong> Is the player consistently getting chances to earn targets? A growing route role can precede stronger production.</li>
-<li><strong>Yards/route:</strong> Does the player turn routes into yardage? Read alongside route count; a few long catches can distort a small sample.</li>
-<li><strong>Targets/route:</strong> Does the player earn targets when running routes? Helps distinguish limited playing time from limited target earning.</li>
-<li><strong>End-zone targets/game:</strong> Is the player getting direct touchdown opportunities? These are scarce, so avoid overreacting to one week.</li>
-<li><strong>First downs/route:</strong> Does the player repeatedly generate useful receiving production? Complements yards/route, but the two overlap heavily.</li>
-</ul>
-<p><strong>Reading pattern:</strong> Rising route participation and target share suggest an expanding role. Rising points with flat opportunity invite a closer look at touchdowns and big plays.</p>
-<h2>Running backs</h2>
-<ul>
-<li><strong>Carries/game:</strong> How much rushing volume does the player receive? Game script can change this without changing backfield status.</li>
-<li><strong>Targets/game:</strong> How involved is the player as a receiver? Receiving work adds half-PPR value and can support production when the team trails.</li>
-<li><strong>Share of RB carries:</strong> How much of the backfield workload does the player control? Pair the percentage with absolute carries.</li>
-<li><strong>Carries inside the five/game:</strong> Is the player receiving valuable rushing touchdown opportunities?</li>
-<li><strong>Route participation:</strong> Is the player part of the passing offense? Pass-blocking snaps do not provide the same target opportunity.</li>
-<li><strong>Share of team inside-five carries:</strong> Who controls goal-line rushing work, including competition from the quarterback? Inspect the count as well as the percentage.</li>
-<li><strong>Yards after contact/carry:</strong> Supporting evidence of rushing performance. Blocking, opponents, and charting affect it; keep workload primary.</li>
-</ul>
-<p><strong>Reading pattern:</strong> Growing carry share plus receiving involvement suggests a broader role. Goal-line work adds scoring potential. High scoring from a narrow, touchdown-heavy role can be more volatile.</p>
-<h2>Across both positions</h2>
-<p>Compare season results with the last four appearances and inspect the weekly timeline. Check sample size, injuries, teammate availability, quarterback changes, and charting coverage before interpreting a trend. Recent usage is evidence of a role change, not a guarantee it will persist.</p></main><footer>Metrics describe completed games and past opportunity. <a href="./">Return to the season monitor</a>.</footer></body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fantasy football metric notes</title>
+    <style>
+      :root {
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        color: #182923;
+        background: #f5f7f4;
+        line-height: 1.7;
+      }
+      body {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 40px 24px 72px;
+      }
+      a {
+        color: #145e49;
+      }
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+      }
+      h2 {
+        margin-top: 2.5rem;
+        font-size: 1.3rem;
+      }
+      li {
+        margin: 0.8rem 0;
+      }
+      a:focus-visible {
+        outline: 3px solid #145e49;
+        outline-offset: 4px;
+      }
+      header {
+        margin-bottom: 32px;
+      }
+      footer {
+        margin-top: 48px;
+        border-top: 1px solid #ccd5cf;
+        padding-top: 24px;
+        font-size: 0.9rem;
+      }
+      h3 {
+        font-size: 1.05rem;
+        margin-top: 1.8rem;
+      }
+      pre {
+        overflow-x: auto;
+        background: #eaf0e9;
+        padding: 16px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        line-height: 1.7;
+      }
+      code {
+        overflow-wrap: anywhere;
+      }
+      pre code {
+        overflow-wrap: normal;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-variant-numeric: tabular-nums;
+        font-size: 0.88rem;
+      }
+      caption {
+        text-align: left;
+        margin: 8px 0;
+        font-weight: 600;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #ccd5cf;
+        padding: 10px 12px;
+        text-align: right;
+        white-space: nowrap;
+      }
+      th:first-child {
+        text-align: left;
+      }
+      section {
+        scroll-margin-top: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <header><a href="./">← Back to dashboard</a></header>
+    <main>
+      <h1>Fantasy football metric notes</h1>
+      <p>
+        Short reading notes for the half-PPR WR and RB season dashboards.
+        Route-based metrics are unavailable from the free data sources used in
+        this version.
+      </p>
+      <h2>Shared scoring measures</h2>
+      <ul>
+        <li>
+          <strong>Points/game:</strong> Who has produced when playing?
+          Touchdowns can move this sharply, so inspect the workload underneath.
+        </li>
+        <li>
+          <strong>Expected points/game (xFP):</strong> How valuable were the
+          opportunities received? This describes past workload, not next-week
+          projected scoring. A gap versus actual points can reflect conversion,
+          skill, offensive context, or noise; it is not an automatic buy/sell
+          signal.
+        </li>
+      </ul>
+      <section aria-labelledby="expected-points">
+        <h2 id="expected-points">How xFP/G is calculated</h2>
+        <p>
+          <strong>xFP/G means expected fantasy points per game.</strong> It
+          estimates the fantasy value of the opportunities a player actually
+          received in completed games. A target that falls incomplete still has
+          opportunity value; a carry near the goal line generally has more
+          touchdown potential than a carry at midfield. The dashboard uses the
+          published
+          <a href="https://github.com/ffverse/ffopportunity"
+            >ffverse/ffopportunity</a
+          >
+          model outputs.
+        </p>
+
+        <h3>1. The provider values individual plays</h3>
+        <p>
+          ffopportunity describes its model as XGBoost models trained on
+          nflverse play-by-play from 2006–2020. Separate fitted models estimate
+          pass completion probability, yards after catch, passing/receiving
+          touchdown probability, interception probability, rushing yards, and
+          rushing touchdown probability. First-down models also exist, but first
+          downs earn no points under this dashboard’s scoring rules.
+        </p>
+        <p>
+          The upstream preprocessing supplies play context such as field
+          position, down and yards to go, air yards, pass direction, run
+          direction/gap, player position, shotgun/no-huddle, score and time
+          remaining, weather, and betting-derived game context. Each fitted
+          model has its own predictor blueprint; this is a learned model, so
+          there is no single fixed “points per target” or “points per carry”
+          multiplier.
+        </p>
+
+        <p>
+          For an ordinary receiving target, the half-PPR scoring relationship
+          is:
+        </p>
+        <pre><code>Expected receiving yards = P(catch) × (air yards + expected yards after catch)
+Target xFP = 0.5 × P(catch)
+           + 0.1 × expected receiving yards
+           + 6 × P(receiving touchdown)</code></pre>
+        <p>
+          The touchdown probability is already a probability for that target; it
+          is not multiplied by catch probability a second time. The provider
+          predicts completion and yards after catch first, uses those outputs
+          when estimating touchdowns, and gives special treatment to passes
+          whose air yards equal the distance to the goal line.
+        </p>
+        <p>For an ordinary rushing attempt:</p>
+        <pre><code>Carry xFP = 0.1 × expected rushing yards
+          + 6 × P(rushing touchdown)</code></pre>
+        <p>
+          The provider also scores two-point opportunities using conversion
+          probabilities, and includes a player’s passing contributions where
+          present: 0.04 per expected passing yard, 4 per expected passing
+          touchdown, −2 per expected interception, and 2 per expected two-point
+          conversion. Its special-play handling covers conversions, kneels,
+          aborted runs, and spikes. These formulas explain ordinary targets and
+          carries; the imported provider total remains the authoritative input
+          for those special cases.
+        </p>
+
+        <h3>2. We convert the published weekly totals to half-PPR</h3>
+        <p>
+          The build reads <code>ep_weekly_2026.parquet</code> from the
+          provider’s
+          <a
+            href="https://github.com/ffverse/ffopportunity/releases/tag/latest-data"
+            >latest-data release</a
+          >. That file already sums each player’s receiving, rushing, and
+          passing expected points for each game under full-PPR scoring.
+        </p>
+        <pre><code>Weekly half-PPR xFP
+  = total_fantasy_points_exp − 0.5 × receptions_exp</code></pre>
+        <p>
+          The subtraction uses <strong>expected receptions</strong>. Actual
+          catches are used only in the separate actual-points conversion:
+          <code>total_fantasy_points − 0.5 × receptions</code>. No return
+          touchdowns or first-down bonuses are added.
+        </p>
+
+        <h3>3. We divide by the player’s games played</h3>
+        <pre><code>xFP/G = sum of weekly half-PPR xFP in the selected period
+        ÷ games played in that period</code></pre>
+        <p>
+          Season includes all eligible appearances through the common
+          completed-week data cutoff. Last 4 games includes that player’s four
+          most recent appearances, even if a bye or absence makes them span more
+          than four calendar weeks. A game counts when the player was active on
+          the weekly roster or recorded any snaps and the team’s game was
+          completed. Zero-target, zero-carry, and special-teams-only appearances
+          count in the denominator; byes and inactive weeks do not.
+        </p>
+        <p>
+          If a player has a counted appearance but no individual ffopportunity
+          row in an otherwise covered game, this dashboard assigns zero actual
+          points and zero xFP for that appearance. That rule assumes no recorded
+          modeled opportunity; an upstream missing-player-row problem would also
+          appear as zero. Whole games missing from a required source are
+          excluded by the shared data cutoff.
+        </p>
+
+        <h3>A worked example from the current snapshot</h3>
+        <p>
+          In the snapshot built October 4, 2026 at 9:05 PM Pacific, Jahmyr Gibbs
+          has three included games:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <caption>
+              Jahmyr Gibbs, 2026 Weeks 1–3
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Week</th>
+                <th scope="col">Full-PPR xFP</th>
+                <th scope="col">Expected catches</th>
+                <th scope="col">Half-PPR xFP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>32.96</td>
+                <td>4.02</td>
+                <td>32.96 − 2.01 = 30.95</td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>21.90</td>
+                <td>5.66</td>
+                <td>21.90 − 2.83 = 19.07</td>
+              </tr>
+              <tr>
+                <th scope="row">3</th>
+                <td>30.84</td>
+                <td>6.59</td>
+                <td>30.84 − 3.295 = 27.545</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <code>(30.95 + 19.07 + 27.545) ÷ 3 = 25.855 xFP/G</code>, displayed as
+          <strong>25.9</strong>. This is a dated calculation example; later
+          refreshes can change the live season value.
+        </p>
+
+        <h3>How to interpret the number</h3>
+        <p>
+          xFP describes the value of observed opportunities using historical
+          outcomes. It does not predict next week’s workload, and the
+          actual-minus-expected gap can reflect execution, skill, context, and
+          model limitations. A player with more valuable targets or goal-line
+          carries can have high xFP despite low actual scoring.
+        </p>
+        <p>
+          <strong>Two implementation details matter:</strong> the provider’s
+          expected-point formulas contain no expected-fumble deduction, while
+          its actual rushing/receiving points include lost-fumble penalties.
+          Also, the provider rounds weekly component sums to two decimals before
+          publishing. The dashboard keeps the precision available in those
+          fields through conversion, aggregation, and sorting, and rounds to one
+          decimal only for display.
+        </p>
+        <p>
+          Method reviewed October 5, 2026 against the provider’s published
+          <code>v1.0.0</code> data version and upstream commit
+          <code>74dcb35</code>. The app consumes the provider’s latest-data feed
+          and records its source timestamp; it does not train these models
+          locally.
+        </p>
+        <p>
+          Source code:
+          <a
+            href="https://github.com/ffverse/ffopportunity/blob/74dcb35a112a71e5349b36abe940316067ec4fec/README.md#about"
+            >model overview and training period</a
+          >,
+          <a
+            href="https://github.com/ffverse/ffopportunity/blob/74dcb35a112a71e5349b36abe940316067ec4fec/R/ep_preprocess.R"
+            >play preprocessing</a
+          >,
+          <a
+            href="https://github.com/ffverse/ffopportunity/blob/74dcb35a112a71e5349b36abe940316067ec4fec/R/ep_predict.R"
+            >component predictions</a
+          >, and
+          <a
+            href="https://github.com/ffverse/ffopportunity/blob/74dcb35a112a71e5349b36abe940316067ec4fec/R/ep_summarize.R"
+            >scoring, weekly sums, and rounding</a
+          >. ffopportunity models and expected-points data are licensed under
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/"
+            >CC BY-SA 4.0</a
+          >.
+        </p>
+      </section>
+      <h2>Wide receivers</h2>
+      <ul>
+        <li>
+          <strong>Targets/game:</strong> How much receiving volume is available
+          before catches happen?
+        </li>
+        <li>
+          <strong>Target share:</strong> How central is the player to the
+          passing offense? Pair it with targets/game because teams throw at
+          different rates.
+        </li>
+        <li>
+          <strong>Route participation:</strong> Is the player consistently
+          getting chances to earn targets? A growing route role can precede
+          stronger production.
+        </li>
+        <li>
+          <strong>Yards/route:</strong> Does the player turn routes into
+          yardage? Read alongside route count; a few long catches can distort a
+          small sample.
+        </li>
+        <li>
+          <strong>Targets/route:</strong> Does the player earn targets when
+          running routes? Helps distinguish limited playing time from limited
+          target earning.
+        </li>
+        <li>
+          <strong>End-zone targets/game:</strong> Is the player getting direct
+          touchdown opportunities? These are scarce, so avoid overreacting to
+          one week.
+        </li>
+        <li>
+          <strong>First downs/route:</strong> Does the player repeatedly
+          generate useful receiving production? Complements yards/route, but the
+          two overlap heavily.
+        </li>
+      </ul>
+      <p>
+        <strong>Reading pattern:</strong> Rising route participation and target
+        share suggest an expanding role. Rising points with flat opportunity
+        invite a closer look at touchdowns and big plays.
+      </p>
+      <h2>Running backs</h2>
+      <ul>
+        <li>
+          <strong>Carries/game:</strong> How much rushing volume does the player
+          receive? Game script can change this without changing backfield
+          status.
+        </li>
+        <li>
+          <strong>Targets/game:</strong> How involved is the player as a
+          receiver? Receiving work adds half-PPR value and can support
+          production when the team trails.
+        </li>
+        <li>
+          <strong>Share of RB carries:</strong> How much of the backfield
+          workload does the player control? Pair the percentage with absolute
+          carries.
+        </li>
+        <li>
+          <strong>Carries inside the five/game:</strong> Is the player receiving
+          valuable rushing touchdown opportunities?
+        </li>
+        <li>
+          <strong>Route participation:</strong> Is the player part of the
+          passing offense? Pass-blocking snaps do not provide the same target
+          opportunity.
+        </li>
+        <li>
+          <strong>Share of team inside-five carries:</strong> Who controls
+          goal-line rushing work, including competition from the quarterback?
+          Inspect the count as well as the percentage.
+        </li>
+        <li>
+          <strong>Yards after contact/carry:</strong> Supporting evidence of
+          rushing performance. Blocking, opponents, and charting affect it; keep
+          workload primary.
+        </li>
+      </ul>
+      <p>
+        <strong>Reading pattern:</strong> Growing carry share plus receiving
+        involvement suggests a broader role. Goal-line work adds scoring
+        potential. High scoring from a narrow, touchdown-heavy role can be more
+        volatile.
+      </p>
+      <h2>Across both positions</h2>
+      <p>
+        Compare season results with the last four appearances and inspect the
+        weekly timeline. Check sample size, injuries, teammate availability,
+        quarterback changes, and charting coverage before interpreting a trend.
+        Recent usage is evidence of a role change, not a guarantee it will
+        persist.
+      </p>
+    </main>
+    <footer>
+      Metrics describe completed games and past opportunity.
+      <a href="./">Return to the season monitor</a>.
+    </footer>
+  </body>
+</html>

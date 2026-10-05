@@ -17,6 +17,8 @@ export default function App() {
     [error, setError] = useState(false),
     [reload, setReload] = useState(0),
     [selected, setSelected] = useState<Partial<Record<Position, string>>>({});
+  const [search, setSearch] = useState("");
+  const [team, setTeam] = useState("");
   const { position, period } = view;
   useEffect(() => {
     const handler = () => setView(locationState());
@@ -143,6 +145,14 @@ export default function App() {
                   position={position}
                   period={period}
                   selectedId={selected[position] ?? ""}
+                  search={search}
+                  team={team}
+                  onSearchChange={setSearch}
+                  onTeamChange={setTeam}
+                  onClearFilters={() => {
+                    setSearch("");
+                    setTeam("");
+                  }}
                   onSelect={(id) =>
                     setSelected((s) => ({ ...s, [position]: id }))
                   }
@@ -191,14 +201,21 @@ export default function App() {
           </details>
         )}
         <p>
-          Data: <a href="https://nflverse.nflverse.com/">nflverse</a> ·{" "}
+          Data: <a href="https://nflverse.nflverse.com/">nflverse</a> (CC BY
+          4.0) ·{" "}
           <a href="https://github.com/ffverse/ffopportunity">
             ffverse/ffopportunity
           </a>{" "}
-          · Pro Football Reference via nflverse. CC-BY 4.0.
+          (CC BY-SA 4.0) · Pro Football Reference via nflverse.
         </p>
         <a href={`${import.meta.env.BASE_URL}metric-notes.html`}>
           Fantasy football metric notes
+        </a>
+        {" · "}
+        <a
+          href={`${import.meta.env.BASE_URL}metric-notes.html#expected-points`}
+        >
+          How xFP/G is calculated
         </a>
         <p>
           Expected points describe past opportunity. Regular season, completed

@@ -12,18 +12,52 @@ export function LeaderboardTable({
   period,
   selectedId,
   onSelect,
+  search = "",
+  team = "",
+  onSearchChange,
+  onTeamChange,
+  onClearFilters,
 }: {
   players: Player[];
   position: Position;
   period: Period;
   selectedId: string;
   onSelect: (id: string) => void;
+  search?: string;
+  team?: string;
+  onSearchChange?: (value: string) => void;
+  onTeamChange?: (value: string) => void;
+  onClearFilters?: () => void;
 }) {
   const [sort, setSort] = useState({ key: "pointsPerGame", descending: true });
   const limit = position === "WR" ? 100 : 50;
-  const population = players.filter((p) => p.periods[period].rank <= limit);
+  const normalize = (name: string) =>
+    name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’‘.]/g, "")
+      .toLowerCase();
+  const query = normalize(search.trim());
+  const filtersActive = Boolean(query || team);
+  const teams = [
+    ...new Set(
+      players
+        .map((p) => p.team)
+        .filter(Boolean)
+        .concat(team ? [team] : []),
+    ),
+  ].sort();
+  const population = players.filter((p) =>
+    filtersActive
+      ? (!query || normalize(p.name).includes(query)) &&
+        (!team || p.team === team)
+      : p.periods[period].rank <= limit,
+  );
   const selected = players.find((p) => p.playerId === selectedId);
-  const pinned = selected && !population.includes(selected) ? selected : null;
+  const pinned =
+    !filtersActive && selected && !population.includes(selected)
+      ? selected
+      : null;
   const ordered = [...population].sort((a, b) => {
     const x = a.periods[period].metrics[sort.key]?.value,
       y = b.periods[period].metrics[sort.key]?.value;
@@ -49,9 +83,53 @@ export function LeaderboardTable({
       <div className="section-heading">
         <h2 id="leaderboard-title">Leaderboard</h2>
         <span>
-          Top {limit} · {period === "season" ? "Season" : "Last 4 games"}
+          {filtersActive ? `All ${position} players` : `Top ${limit}`} ·{" "}
+          {period === "season" ? "Season" : "Last 4 games"}
         </span>
       </div>
+      {onSearchChange && onTeamChange && (
+        <div className="leaderboard-filters">
+          <label className="search-filter">
+            Search players
+            <input
+              type="search"
+              value={search}
+              placeholder="Player name"
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </label>
+          <label className="team-filter">
+            Team
+            <select
+              title="Filter by each player's most recent team"
+              value={team}
+              onChange={(e) => onTeamChange(e.target.value)}
+            >
+              <option value="">All teams</option>
+              {teams.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
+          {filtersActive && (
+            <button className="clear-filters" onClick={onClearFilters}>
+              Clear filters
+            </button>
+          )}
+          <span className="filter-count" role="status">
+            {ordered.length}{" "}
+            {filtersActive
+              ? ordered.length === 1
+                ? "result"
+                : "results"
+              : ordered.length === 1
+                ? "player"
+                : "players"}
+          </span>
+        </div>
+      )}
       <div
         className="table-scroll"
         role="region"
@@ -96,6 +174,16 @@ export function LeaderboardTable({
             </tr>
           </thead>
           <tbody>
+            {!ordered.length && (
+              <tr>
+                <td
+                  className="no-matches"
+                  colSpan={columns[position].length + 1}
+                >
+                  No players match these filters.
+                </td>
+              </tr>
+            )}
             {ordered.map((p) => (
               <tr
                 key={p.playerId}

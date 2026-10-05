@@ -63,7 +63,7 @@ const common: Column[] = [
     key: "xfpPerGame",
     label: "xFP/G",
     digits: 1,
-    help: "Half-PPR expected fantasy points from ffopportunity divided by games played; describes past opportunity.",
+    help: "ffopportunity full-PPR expected points minus 0.5 × expected receptions, summed over included games and divided by games played. See metric notes for the model and calculation.",
   },
 ];
 const targets: Column = {

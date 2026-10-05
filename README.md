@@ -40,8 +40,9 @@ After a live build, run `.venv/bin/pytest -m realdata` to reconcile player total
 - End-zone targets are pass attempts with a receiver, excluding sacks, where air yards reach the goal line. Missing air yards are excluded and reported.
 - Charted routes are unavailable from the free sources and display `—`. Yards after contact uses only PFR charted games and reports coverage.
 - Weekly charts always show all 18 regular-season weeks; selected-period week labels are emphasized without background bars. Horizontal WR10/WR20 or RB10/RB20 references show the tenth- and twentieth-highest season values for each chart's metric (actual points/game, WR target share, or RB carry share). Each metric is ranked independently across the entire position, and references stay fixed when the summary period changes.
+- Name search and the most-recent-team filter combine across all players in the position, including players outside the default top 100 WRs or top 50 RBs. Filters persist across period and position switches. Clearing them restores the default leaderboard and any selected-player pin; filtering does not change the selected detail or full-position chart benchmarks.
 
-The dashboard links to companion [metric notes](web/public/metric-notes.html). Interpretation stays there; metric help in the dashboard describes calculations and denominators.
+The dashboard links to companion [metric notes](web/public/metric-notes.html#expected-points), including the full xFP methodology, provider component formulas, half-PPR conversion, games-played denominator, and a worked example. The provider uses XGBoost models trained on 2006–2020 play-by-play. It does not include an expected-fumble penalty, and its published weekly components are already rounded to two decimals; this app adds no further rounding before display.
 
 ## Data and freshness
 
@@ -53,4 +54,4 @@ A failed download or build exits unsuccessfully and preserves the last successfu
 
 Target: `jxp9pd/fantasy-dashboard`, a public repository with Pages source set to **GitHub Actions**. Vite uses the `/fantasy-dashboard/` base path. The workflow tests the pipeline, builds current data, verifies the frontend and browser interactions, then deploys via a dependent job. It runs on pushes to `main`, manual dispatch, and daily at 13:00 UTC (06:00 Pacific daylight time / 05:00 Pacific standard time).
 
-Data attribution: [nflverse](https://nflverse.nflverse.com/), [ffverse/ffopportunity](https://github.com/ffverse/ffopportunity), and [Pro Football Reference](https://www.pro-football-reference.com/) via nflverse. Data is attributed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); see each source's licensing and methodology for details.
+Data attribution: [nflverse](https://nflverse.nflverse.com/) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), [ffverse/ffopportunity](https://github.com/ffverse/ffopportunity) (models and expected-points data under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)), and [Pro Football Reference](https://www.pro-football-reference.com/) via nflverse. See each source's licensing and methodology for details.
