@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { SeasonBenchmark } from "./benchmarks";
 import {
   format,
   type Player,
@@ -11,11 +12,13 @@ export function WeeklyChart({
   period,
   position,
   kind,
+  benchmarks = [],
 }: {
   player: Player;
   period: Period;
   position: Position;
   kind: "scoring" | "role";
+  benchmarks?: SeasonBenchmark[];
 }) {
   const [active, setActive] = useState<number | null>(null);
   const scoring = kind === "scoring";
@@ -41,9 +44,15 @@ export function WeeklyChart({
       ? keys.map((k) => w.values[k]).filter((v): v is number => v != null)
       : [],
   );
-  const low = scoring ? Math.min(0, ...values) : 0,
-    high = scoring ? Math.max(10, ...values) * 1.12 : 1;
-  const x = (week: number) => 42 + (week - 1) * 25.3,
+  const domainValues = [
+    ...values,
+    ...benchmarks.map((benchmark) => benchmark.value),
+  ];
+  const low = scoring ? Math.min(0, ...domainValues) : 0,
+    high = scoring
+      ? Math.max(10, ...domainValues) * 1.12
+      : Math.max(1, ...domainValues);
+  const x = (week: number) => 42 + (week - 1) * (438 / 17),
     y = (value: number) => 168 - ((value - low) / (high - low)) * 130;
   const annotation = (w: WeekSlot) =>
     w.pending
@@ -98,6 +107,15 @@ export function WeeklyChart({
             Route participation · unavailable
           </span>
         )}
+        {benchmarks.map((benchmark) => (
+          <span
+            key={benchmark.rank}
+            title={`${benchmark.rank}th-highest season ${scoring ? "points per game" : labels[0].toLowerCase()}`}
+          >
+            <i className={`legend-reference-${benchmark.rank}`} />
+            {benchmark.label} · {format(benchmark.value, 1, !scoring)}
+          </span>
+        ))}
       </div>
       <svg
         viewBox="0 0 500 212"
@@ -124,6 +142,25 @@ export function WeeklyChart({
             </text>
           </g>
         ))}
+        {benchmarks.map((benchmark) => (
+          <line
+            key={benchmark.rank}
+            data-benchmark={benchmark.label}
+            data-value={benchmark.value}
+            x1={x(1)}
+            x2={x(18)}
+            y1={y(benchmark.value)}
+            y2={y(benchmark.value)}
+            className={`reference-line reference-${benchmark.rank}`}
+            strokeDasharray={benchmark.rank === 10 ? "10 5" : "2 5"}
+          >
+            <title>
+              {benchmark.label}: {format(benchmark.value, 1, !scoring)} ·{" "}
+              {benchmark.rank}th-highest season{" "}
+              {scoring ? "points per game" : labels[0].toLowerCase()}
+            </title>
+          </line>
+        ))}
         {weeks.map((w) => (
           <g
             key={w.week}
@@ -133,20 +170,11 @@ export function WeeklyChart({
               w.week,
             )}
           >
-            {player.periods[period].coveredWeeks.includes(w.week) && (
-              <rect
-                x={x(w.week) - 10}
-                y="30"
-                width="20"
-                height="143"
-                className="period-highlight"
-              />
-            )}
             <text
               x={x(w.week)}
               y="191"
               textAnchor="middle"
-              className="axis-label"
+              className={`axis-label${player.periods[period].coveredWeeks.includes(w.week) ? " selected-week" : ""}`}
             >
               {w.week}
             </text>
@@ -197,9 +225,9 @@ export function WeeklyChart({
             >
               <rect
                 x={x(w.week) - 12}
-                y="30"
+                y="38"
                 width="24"
-                height="143"
+                height="130"
                 fill="transparent"
               />
               {keys.map(
@@ -224,7 +252,8 @@ export function WeeklyChart({
           : "Explore a point for weekly values."}
       </div>
       <p className="chart-caption">
-        NFL week · shaded weeks are included in the selected period
+        NFL week
+        {benchmarks.length > 0 && " · Reference lines use season averages"}
       </p>
       <div className="sr-only">
         <table>

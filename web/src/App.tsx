@@ -77,9 +77,6 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="page-header">
-        <div className="brand">
-          FIELDNOTES <span>Fantasy football · season monitor</span>
-        </div>
         <nav aria-label="Positions">
           {(["WR", "RB"] as Position[]).map((p) => (
             <a
@@ -97,7 +94,6 @@ export default function App() {
         </nav>
         <div className="title-row">
           <div>
-            <p className="eyebrow">Opportunity. Production. Perspective.</p>
             <h1>{position === "WR" ? "Wide receivers" : "Running backs"}</h1>
           </div>
           <div
@@ -116,22 +112,6 @@ export default function App() {
             ))}
           </div>
         </div>
-        {data && (
-          <p className="context">
-            {data.meta.season} <span>·</span> {data.meta.scoring} <span>·</span>{" "}
-            Data through week {data.meta.dataThroughWeek}
-            <br />
-            <span className="refresh">
-              Last refreshed{" "}
-              <time dateTime={data.meta.builtAt}>
-                {new Date(data.meta.builtAt).toLocaleString("en-US", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
-              </time>
-            </span>
-          </p>
-        )}
       </header>
       <main>
         {!data && !error && (
@@ -148,19 +128,6 @@ export default function App() {
         )}
         {data && (
           <>
-            {Date.now() - Date.parse(data.meta.builtAt) >
-              36 * 60 * 60 * 1000 && (
-              <p className="banner" role="status">
-                This snapshot is more than 36 hours old. Check the refresh time
-                before comparing players.
-              </p>
-            )}
-            {data.meta.partial && (
-              <p className="banner" role="status">
-                Partial refresh: {lagging.join(", ") || "one or more sources"}{" "}
-                lag behind the latest completed games.
-              </p>
-            )}
             {!data.players.length ? (
               <div className="state">
                 <h2>No completed-game results yet</h2>
@@ -184,6 +151,7 @@ export default function App() {
                   <PlayerDetail
                     key={selectedPlayer.playerId}
                     player={selectedPlayer}
+                    players={data.players}
                     position={position}
                     period={period}
                   />
@@ -194,6 +162,34 @@ export default function App() {
         )}
       </main>
       <footer>
+        {data && (
+          <details className="data-details">
+            <summary>Data details</summary>
+            <p>
+              {data.meta.season} · {data.meta.scoring} · Data through week{" "}
+              {data.meta.dataThroughWeek}
+            </p>
+            <p>
+              Last refreshed{" "}
+              <time dateTime={data.meta.builtAt}>
+                {new Date(data.meta.builtAt).toLocaleString("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </time>
+            </p>
+            {data.meta.partial && (
+              <p>
+                Awaiting updates from{" "}
+                {lagging.join(", ") || "one or more sources"}.
+              </p>
+            )}
+            {Date.now() - Date.parse(data.meta.builtAt) >
+              36 * 60 * 60 * 1000 && (
+              <p>This snapshot is more than 36 hours old.</p>
+            )}
+          </details>
+        )}
         <p>
           Data: <a href="https://nflverse.nflverse.com/">nflverse</a> ·{" "}
           <a href="https://github.com/ffverse/ffopportunity">

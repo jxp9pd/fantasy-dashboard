@@ -39,13 +39,13 @@ After a live build, run `.venv/bin/pytest -m realdata` to reconcile player total
 - Carries exclude kneels and two-point tries. RB carry share includes season-rostered RB/FB carries, excluding QB/WR/TE runs. Inside-five team share includes all rushers.
 - End-zone targets are pass attempts with a receiver, excluding sacks, where air yards reach the goal line. Missing air yards are excluded and reported.
 - Charted routes are unavailable from the free sources and display `—`. Yards after contact uses only PFR charted games and reports coverage.
-- Weekly charts always show all 18 regular-season weeks; selected-period appearances are highlighted.
+- Weekly charts always show all 18 regular-season weeks; selected-period week labels are emphasized without background bars. Horizontal WR10/WR20 or RB10/RB20 references show the tenth- and twentieth-highest season values for each chart's metric (actual points/game, WR target share, or RB carry share). Each metric is ranked independently across the entire position, and references stay fixed when the summary period changes.
 
 The dashboard links to companion [metric notes](web/public/metric-notes.html). Interpretation stays there; metric help in the dashboard describes calculations and denominators.
 
 ## Data and freshness
 
-Sources are nflverse play-by-play, weekly rosters, schedules, snap counts, injuries, PFR advanced rushing via nflverse, and ffverse/ffopportunity expected points. Source release timestamps and week coverage are recorded in each output. Only completed games through the shared source cutoff enter aggregates. The interface identifies lagging feeds, missing charting coverage, and snapshots older than 36 hours.
+Sources are nflverse play-by-play, weekly rosters, schedules, snap counts, injuries, PFR advanced rushing via nflverse, and ffverse/ffopportunity expected points. Source release timestamps and week coverage are recorded in each output. Only completed games through the shared source cutoff enter aggregates. The collapsed Data details footer contains season/scoring context, refresh time, and lagging or stale source information; missing charting coverage remains beside its metric.
 
 A failed download or build exits unsuccessfully and preserves the last successful snapshot. Snapshots are staged outside the public directory and published by an atomic symlink swap, so both position files change together. A failed CI refresh never reaches the deployment job, leaving the published site intact.
 

@@ -6,6 +6,7 @@ import {
   type Position,
 } from "./types";
 import { WeeklyChart } from "./WeeklyChart";
+import { seasonBenchmarks } from "./benchmarks";
 export function SupportingMetrics({
   player,
   position,
@@ -82,10 +83,12 @@ export function SupportingMetrics({
 }
 export function PlayerDetail({
   player,
+  players = [],
   position,
   period,
 }: {
   player: Player;
+  players?: Player[];
   position: Position;
   period: Period;
 }) {
@@ -100,13 +103,13 @@ export function PlayerDetail({
     >
       <header className="detail-header">
         <div>
-          <p className="eyebrow">
-            Selected player · {period === "season" ? "Season" : "Last 4 games"}
-          </p>
           <h2>
             {player.name} <span>{player.team}</span>
           </h2>
-          <p>Weeks {agg.coveredWeeks.join(", ") || "—"}</p>
+          <p>
+            <span>{period === "season" ? "Season" : "Last 4 games"} · </span>
+            <span>Weeks {agg.coveredWeeks.join(", ") || "—"}</span>
+          </p>
         </div>
         <p className="sample-size">
           <strong>{agg.games}</strong> games played <span>·</span>{" "}
@@ -122,12 +125,14 @@ export function PlayerDetail({
           period={period}
           position={position}
           kind="scoring"
+          benchmarks={seasonBenchmarks(players, position, "scoring")}
         />
         <WeeklyChart
           player={player}
           period={period}
           position={position}
           kind="role"
+          benchmarks={seasonBenchmarks(players, position, "role")}
         />
       </div>
       <SupportingMetrics player={player} position={position} period={period} />

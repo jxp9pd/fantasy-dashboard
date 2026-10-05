@@ -31,7 +31,7 @@ it("renders empty data", async () => {
     await screen.findByText("No completed-game results yet"),
   ).toBeInTheDocument();
 });
-it("shows header, initial descending order, named partial source, stale state and attribution", async () => {
+it("keeps the header simple and places freshness details in a closed footer disclosure", async () => {
   const d = snapshot();
   d.meta.partial = true;
   d.meta.laggingSources = ["PFR advanced rushing"];
@@ -45,8 +45,15 @@ it("shows header, initial descending order, named partial source, stale state an
     "2026",
   );
   expect(
-    screen.getByText(/Partial refresh: PFR advanced rushing/),
+    screen.queryByText(/Opportunity\. Production/),
+  ).not.toBeInTheDocument();
+  expect(screen.queryByText(/Partial refresh:/)).not.toBeInTheDocument();
+  const details = screen.getByText("Data details").closest("details");
+  expect(details).not.toHaveAttribute("open");
+  expect(
+    within(details!).getByText(/Awaiting updates from PFR advanced rushing/),
   ).toBeInTheDocument();
+  expect(document.querySelector(".page-header")).not.toHaveTextContent("2026");
   expect(screen.getByText(/more than 36 hours old/)).toBeInTheDocument();
   expect(
     screen.getByText(/Pro Football Reference via nflverse/),
