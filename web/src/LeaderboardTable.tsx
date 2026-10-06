@@ -59,9 +59,18 @@ export function LeaderboardTable({
     !filtersActive && selected && !population.includes(selected)
       ? selected
       : null;
+  const metricValue = (player: Player, key: string) => {
+    const metrics = player.periods[period].metrics;
+    if (key === "delta") {
+      const actual = metrics.pointsPerGame?.value;
+      const expected = metrics.xfpPerGame?.value;
+      return actual == null || expected == null ? null : actual - expected;
+    }
+    return metrics[key]?.value;
+  };
   const ordered = [...population].sort((a, b) => {
-    const x = a.periods[period].metrics[sort.key]?.value,
-      y = b.periods[period].metrics[sort.key]?.value;
+    const x = metricValue(a, sort.key),
+      y = metricValue(b, sort.key);
     if (x == null) return y == null ? 0 : 1;
     if (y == null) return -1;
     return (x - y) * (sort.descending ? -1 : 1) || a.name.localeCompare(b.name);
@@ -140,7 +149,16 @@ export function LeaderboardTable({
         <table>
           <thead>
             <tr>
-              <th scope="col">Player</th>
+              <th
+                scope="col"
+                className="rank-column"
+                title="Row number in the current sorted and filtered list."
+              >
+                Rank
+              </th>
+              <th scope="col" className="player-column">
+                Player
+              </th>
               {columns[position].map((c) => (
                 <th
                   key={c.key}
@@ -179,13 +197,13 @@ export function LeaderboardTable({
               <tr>
                 <td
                   className="no-matches"
-                  colSpan={columns[position].length + 1}
+                  colSpan={columns[position].length + 2}
                 >
                   No players match these filters.
                 </td>
               </tr>
             )}
-            {ordered.map((p) => (
+            {ordered.map((p, index) => (
               <tr
                 key={p.playerId}
                 tabIndex={0}
@@ -198,6 +216,7 @@ export function LeaderboardTable({
                   }
                 }}
               >
+                <td className="rank-column">{index + 1}</td>
                 <th scope="row">
                   <span className="player-name">{p.name}</span>
                   <span className="player-team">
@@ -215,7 +234,7 @@ export function LeaderboardTable({
                     {format(
                       c.unavailable
                         ? null
-                        : p.periods[period].metrics[c.key]?.value,
+                        : metricValue(p, c.key),
                       c.digits,
                       c.percent,
                     )}

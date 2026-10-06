@@ -33,6 +33,7 @@ After a live build, run `.venv/bin/pytest -m realdata` to reconcile player total
 
 ## Definitions
 
+- Rank numbers the displayed rows from 1 to n, following the current sort and filters (including a pinned selection). Delta is actual Points/G minus xFP/G for the selected period, calculated and sorted before display rounding; it is unavailable if either input is missing.
 - Scoring is standard half-PPR with no return touchdowns: 0.5/reception, 0.1/rushing or receiving yard, 6/rushing or receiving touchdown, −2/fumble lost, +2/two-point conversion, 0.04/passing yard, 4/passing touchdown, −2/interception. Actual and expected points use ffopportunity's full-PPR totals minus half the respective reception totals. Expected points describe past opportunity, not a projection.
 - A completed appearance counts when a player is active on the weekly roster or records any snaps, including special teams. Zero-opportunity games count. Last 4 means the player's four most recent appearances.
 - Shares use summed opportunities over those appearances. Team totals include the full game and follow the player's team each week.

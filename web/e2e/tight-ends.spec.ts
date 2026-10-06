@@ -21,7 +21,7 @@ test('Tight ends tab shows the top 25 receiving players and survives direct navi
   const table = page.getByRole('region', { name: 'Player leaderboard' });
   await expect(table.getByRole('rowheader')).toHaveCount(25);
   await expect(table.getByRole('button')).toHaveText([
-    'Points/G ↓', 'xFP/G ↕', 'Targets/G ↕', 'Target share ↕', 'Route % ↕', 'Yards/route ↕',
+    'Points/G ↓', 'xFP/G ↕', 'Delta ↕', 'Targets/G ↕', 'Target share ↕', 'Route % ↕', 'Yards/route ↕',
   ]);
   await expect(table.getByText('Fixture Tight End 26', { exact: true })).toHaveCount(0);
   await expect(table.getByText('Fixture Alpha Receiver', { exact: true })).toHaveCount(0);

@@ -102,6 +102,10 @@
       <h2>Shared scoring measures</h2>
       <ul>
         <li>
+          <strong>Rank:</strong> The row number in the current table, from 1
+          onward. It updates with sorting and filtering.
+        </li>
+        <li>
           <strong>Points/game:</strong> Who has produced when playing?
           Touchdowns can move this sharply, so inspect the workload underneath.
         </li>
@@ -111,6 +115,12 @@
           projected scoring. A gap versus actual points can reflect conversion,
           skill, offensive context, or noise; it is not an automatic buy/sell
           signal.
+        </li>
+        <li>
+          <strong>Delta:</strong> Points/game minus expected points/game for
+          the selected period, calculated before rounding. Positive values mean
+          production above expectation; negative values mean below expectation.
+          Missing inputs display as unavailable.
         </li>
       </ul>
       <section aria-labelledby="expected-points">

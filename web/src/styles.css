@@ -172,9 +172,13 @@ thead th {
   font-weight: 500;
   border-block: 1px solid #e2e6de;
 }
-thead th:first-child {
+thead th.player-column {
   text-align: left;
   min-width: 235px;
+}
+.rank-column {
+  width: 1%;
+  padding-inline: 12px;
 }
 thead button {
   border: 0;

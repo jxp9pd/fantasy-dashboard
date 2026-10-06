@@ -71,6 +71,12 @@ const common: Column[] = [
     digits: 1,
     help: "ffopportunity full-PPR expected points minus 0.5 × expected receptions, summed over included games and divided by games played. See metric notes for the model and calculation.",
   },
+  {
+    key: "delta",
+    label: "Delta",
+    digits: 1,
+    help: "Actual points per game minus expected points per game (Points/G − xFP/G) for the selected period. Positive values are above expectation; negative values are below.",
+  },
 ];
 const targets: Column = {
   key: "targetsPerGame",
