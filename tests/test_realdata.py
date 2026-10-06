@@ -59,13 +59,38 @@ def test_live_top_target_and_carry_reconciliation(live):
 
 def test_live_yac_coverage(live):
     docs, _ = live
-    slots = [
-        s
-        for p in docs["rb"]["players"]
-        for s in p["weeks"]
-        if s["status"] == "played" and s["values"]["carries"] > 0
-    ]
-    assert sum(s["values"]["yacCovered"] for s in slots) / len(slots) >= 0.95
+    cache = Path(__file__).resolve().parents[1] / "data/raw"
+    season = docs["rb"]["meta"]["season"]
+    roster = read_rows(cache / f"roster_weekly_{season}.parquet")
+    ids = {r["pfr_id"]: r["gsis_id"] for r in roster if r.get("pfr_id")}
+    # PFR is optional and often publishes only some games in the newest week.
+    # Reconcile every covered/missing slot to its actual source instead of
+    # requiring a season-wide coverage percentage that rejects valid refreshes.
+    source = next(s for s in docs["rb"]["meta"]["sources"] if s["name"] == "rushing")
+    path = cache / f"advstats_week_rush_{season}.parquet"
+    rows = read_rows(path) if source["throughWeek"] else []
+    charted = {
+        (ids[r["pfr_player_id"]], int(r["week"]), r["team"]): r
+        for r in rows
+        if r.get("game_type", "REG") == "REG"
+        and r["pfr_player_id"] in ids
+        and r.get("rushing_yards_after_contact") is not None
+        and r.get("carries") is not None
+    }
+    for player in docs["rb"]["players"]:
+        for slot in player["weeks"]:
+            if slot["status"] != "played":
+                continue
+            row = charted.get((player["playerId"], slot["week"], slot["team"]))
+            assert bool(slot["values"]["yacCovered"]) == (row is not None)
+            assert slot["values"]["yac"] == (row["rushing_yards_after_contact"] if row else 0)
+            assert slot["values"]["chartedCarries"] == (row["carries"] if row else 0)
+        for aggregate in player["periods"].values():
+            slots = [s for s in player["weeks"] if s["week"] in aggregate["coveredWeeks"]]
+            assert aggregate["coverage"]["yardsAfterContactPerCarry"] == {
+                "covered": sum(s["values"]["yacCovered"] for s in slots),
+                "total": len(slots),
+            }
 
 
 def test_live_first_four_end_zone_count(live):

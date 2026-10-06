@@ -79,6 +79,18 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="page-header">
+        <a className="notes-subtitle" href="https://jpentakalos.com/tools/">
+          ← Penta Projects
+        </a>
+        <div className="dashboard-heading">
+          <h1>Fantasy Dashboard</h1>
+          <a
+            className="notes-subtitle"
+            href={`${import.meta.env.BASE_URL}metric-notes.html`}
+          >
+            Metric notes <span aria-hidden="true">↗</span>
+          </a>
+        </div>
         <nav aria-label="Positions">
           {(["WR", "RB"] as Position[]).map((p) => (
             <a
@@ -96,7 +108,9 @@ export default function App() {
         </nav>
         <div className="title-row">
           <div>
-            <h1>{position === "WR" ? "Wide receivers" : "Running backs"}</h1>
+            <h2 className="position-title">
+              {position === "WR" ? "Wide receivers" : "Running backs"}
+            </h2>
           </div>
           <div
             className="period-controls"

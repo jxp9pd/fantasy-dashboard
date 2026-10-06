@@ -394,6 +394,46 @@ Target xFP = 0.5 × P(catch)
         potential. High scoring from a narrow, touchdown-heavy role can be more
         volatile.
       </p>
+      <h2 id="position-comparisons">Position percentile comparisons</h2>
+      <p>
+        Supporting metric bars show the selected player alongside the 25th,
+        50th (median), 75th, and 95th percentiles for qualifying players at the
+        same position. They follow the selected Season or Last 4 games period
+        and use the full position population, regardless of table filters or
+        leaderboard rank. Last 4 means each player’s last four appearances.
+      </p>
+      <ul>
+        <li>
+          <strong>RB inside-five carry share:</strong> At least two games,
+          20 player carries, and five team inside-five carries during those
+          appearances. Players with zero inside-five carries still qualify if
+          they meet these minimums. The team denominator includes quarterbacks
+          and other positions.
+        </li>
+        <li>
+          <strong>RB rushing yards after contact per carry:</strong> At least
+          20 charted carries across two PFR-covered games. Only charted carries
+          enter this rate; the player’s covered-game count remains visible.
+        </li>
+        <li>
+          <strong>WR end-zone targets per game:</strong> At least two games and
+          10 targets. Zero end-zone targets remains a valid value; targets with
+          missing air yards are excluded from the end-zone count as usual.
+        </li>
+      </ul>
+      <p>
+        Each qualifying player has equal weight. Percentiles use unrounded
+        metric values sorted from lowest to highest, with linear interpolation
+        at index (player count − 1) × percentile. At least five qualifying
+        players are needed to show benchmarks. These describe the eligible
+        sample, rather than fixed performance targets.
+      </p>
+      <p>
+        A selected player below the minimum still appears with a sample-size
+        note and does not enter the reference population. Missing values appear
+        as —, not zero. All bars start at zero; carry share uses a 0–100% scale,
+        and other scales include both the benchmarks and the player’s value.
+      </p>
       <h2>Across both positions</h2>
       <p>
         Compare season results with the last four appearances and inspect the

@@ -39,6 +39,7 @@ After a live build, run `.venv/bin/pytest -m realdata` to reconcile player total
 - Carries exclude kneels and two-point tries. RB carry share includes season-rostered RB/FB carries, excluding QB/WR/TE runs. Inside-five team share includes all rushers.
 - End-zone targets are pass attempts with a receiver, excluding sacks, where air yards reach the goal line. Missing air yards are excluded and reported.
 - Charted routes are unavailable from the free sources and display `—`. Yards after contact uses only PFR charted games and reports coverage.
+- Supporting metric bars compare the selected player with P25/P50/P75/P95 of all qualified players at the position in the selected period, independent of table filters. Inside-five share requires 2 games, 20 player carries, and 5 team inside-five attempts; contact yards/carry requires 20 charted carries across 2 covered games; WR end-zone targets/game requires 2 games and 10 targets. Percentiles weight each qualified player equally and interpolate between sorted values; at least 5 qualifiers are required. Zero values remain eligible. Players below the minimum still display their value with a note, and missing values stay `—`.
 - Weekly charts always show all 18 regular-season weeks; selected-period week labels are emphasized without background bars. Horizontal WR10/WR20 or RB10/RB20 references show the tenth- and twentieth-highest season values for each chart's metric (actual points/game, WR target share, or RB carry share). Each metric is ranked independently across the entire position, and references stay fixed when the summary period changes.
 - Name search and the most-recent-team filter combine across all players in the position, including players outside the default top 100 WRs or top 50 RBs. Filters persist across period and position switches. Clearing them restores the default leaderboard and any selected-player pin; filtering does not change the selected detail or full-position chart benchmarks.
 
@@ -50,8 +51,14 @@ Sources are nflverse play-by-play, weekly rosters, schedules, snap counts, injur
 
 A failed download or build exits unsuccessfully and preserves the last successful snapshot. Snapshots are staged outside the public directory and published by an atomic symlink swap, so both position files change together. A failed CI refresh never reaches the deployment job, leaving the published site intact.
 
-## GitHub Pages
+## Production hosting
 
-Target: `jxp9pd/fantasy-dashboard`, a public repository with Pages source set to **GitHub Actions**. Vite uses the `/fantasy-dashboard/` base path. The workflow tests the pipeline, builds current data, verifies the frontend and browser interactions, then deploys via a dependent job. It runs on pushes to `main`, manual dispatch, and daily at 13:00 UTC (06:00 Pacific daylight time / 05:00 Pacific standard time).
+Live dashboard: **https://jpentakalos.com/fantasy-dashboard/**, linked from the site's Tools page. The source is `jxp9pd/fantasy-dashboard`; the static production build is served by nginx on the existing personal-site Hetzner server. Vite uses the `/fantasy-dashboard/` base path. No local computer or application server needs to stay running.
+
+The workflow tests the pipeline, builds current data, reconciles it against the sources, and verifies the frontend and browser interactions before a dependent deployment job runs. It runs on pushes to `main`, manual dispatch, and daily at 13:00 UTC (06:00 Pacific daylight time / 05:00 Pacific standard time). Refresh failures keep the last published release online.
+
+Deployment uses the repository secrets `DEPLOY_HOST`, `DEPLOY_SSH_KEY`, and `DEPLOY_KNOWN_HOSTS`. The dedicated SSH key is restricted to `/usr/local/bin/deploy-fantasy-dashboard.py` as the `fantasy-deploy` user, with forwarding and interactive login disabled. The receiver accepts a compressed static build over stdin, rejects unsafe archives and mismatched WR/RB snapshots, then atomically changes `/var/www/fantasy-dashboard/current`. The most recent five releases and previous hashed frontend assets are retained. The dashboard lives outside the personal-site Git checkout, so normal site deployments cannot erase it.
+
+Server configuration is versioned in [`deploy/`](deploy/README.md). HTML and data snapshots revalidate through Cloudflare so a daily refresh is visible without waiting for the normal static-asset cache expiry.
 
 Data attribution: [nflverse](https://nflverse.nflverse.com/) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), [ffverse/ffopportunity](https://github.com/ffverse/ffopportunity) (models and expected-points data under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)), and [Pro Football Reference](https://www.pro-football-reference.com/) via nflverse. See each source's licensing and methodology for details.

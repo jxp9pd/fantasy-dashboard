@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: github-pages
+  group: fantasy-dashboard-production
   cancel-in-progress: false
 
 jobs:
@@ -68,22 +68,48 @@ jobs:
           name: browser-test-results
           path: web/test-results
           if-no-files-found: ignore
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload verified dashboard
+        uses: actions/upload-artifact@v4
         with:
+          name: dashboard
           path: web/dist
+          if-no-files-found: error
+          retention-days: 7
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: production
+      url: https://jpentakalos.com/fantasy-dashboard/
+    timeout-minutes: 5
     steps:
-      - uses: actions/configure-pages@v5
-      - name: Deploy verified snapshot
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dashboard
+          path: dist
+      - name: Publish verified snapshot to Hetzner
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/dashboard_deploy' EXIT
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/dashboard_deploy
+          chmod 600 ~/.ssh/dashboard_deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          tar -czf dashboard.tar.gz -C dist .
+          # The key can only run the server's static-release receiver.
+          ssh -i ~/.ssh/dashboard_deploy -o IdentitiesOnly=yes \
+            -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=15 "fantasy-deploy@$DEPLOY_HOST" \
+            < dashboard.tar.gz
+      - name: Verify public dashboard and both position snapshots
+        run: |
+          set -euo pipefail
+          for path in '' 'metric-notes.html' 'data/wr.json' 'data/rb.json'; do
+            curl --fail --silent --show-error --retry 3 \
+              "https://jpentakalos.com/fantasy-dashboard/$path" -o /dev/null
+          done

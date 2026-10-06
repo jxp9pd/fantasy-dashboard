@@ -53,7 +53,7 @@ it("shows correct WR and RB samples and supporting opportunity coverage", () => 
     <PlayerDetail player={data.players[0]} position="WR" period="season" />,
   );
   expect(screen.getByText(/— routes run/)).toBeInTheDocument();
-  expect(screen.getByText("1.3")).toBeInTheDocument();
+  expect(screen.getAllByText("1.3")).toHaveLength(2);
   expect(
     screen.getByText(/5 end-zone targets · 2 targets excluded/),
   ).toBeInTheDocument();
@@ -61,7 +61,7 @@ it("shows correct WR and RB samples and supporting opportunity coverage", () => 
     <PlayerDetail player={data.players[0]} position="RB" period="season" />,
   );
   expect(screen.getByText(/32 carries/)).toBeInTheDocument();
-  expect(screen.getByText("42.9%")).toBeInTheDocument();
+  expect(screen.getAllByText("42.9%")).toHaveLength(2);
   expect(screen.getByText("6 of 14 team attempts")).toBeInTheDocument();
   expect(screen.getByText(/3 of 4 games covered/)).toBeInTheDocument();
 });
@@ -69,5 +69,6 @@ it("renders zero-denominator supporting rate as missing", () => {
   const p = snapshot().players[0];
   p.periods.season.metrics.inside5Share = { value: null, num: 0, den: 0 };
   render(<SupportingMetrics player={p} position="RB" period="season" />);
-  expect(screen.getAllByText("—")).toHaveLength(2);
+  expect(screen.getByTestId("comparison-inside5Share").querySelector('[data-comparison="Player"]')).toHaveAttribute("data-value", "");
+  expect(screen.getByText("Player value unavailable for this period.")).toBeInTheDocument();
 });

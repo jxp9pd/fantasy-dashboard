@@ -43,6 +43,37 @@ tr:focus-visible,
   margin: 0 0 28px;
   border-bottom: 1px solid #d9dfd8;
 }
+.dashboard-heading {
+  margin-bottom: 32px;
+}
+.dashboard-heading h1 {
+  color: #214c3f;
+}
+.notes-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #bdcfc3;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.notes-subtitle:hover {
+  color: #123f31;
+  border-bottom-color: currentColor;
+}
+.notes-subtitle span {
+  font-size: 15px;
+}
+.position-title {
+  font-family: Manrope, system-ui;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  margin: 0;
+}
 .page-header nav a {
   text-decoration: none;
   padding: 0 0 12px;
@@ -329,7 +360,7 @@ td {
 }
 .supporting {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   margin-top: 18px;
 }
@@ -358,6 +389,65 @@ td {
   font-size: 10px;
   margin-bottom: 0;
   line-height: 1.6;
+}
+.metric-with-comparison {
+  background: white;
+  border: 1px solid #dce1da;
+}
+.supporting-rb .metric-unavailable,
+.supporting-wr .metric-with-comparison {
+  grid-column: 1 / -1;
+}
+.metric-comparison {
+  margin: 22px 0 0;
+}
+.comparison-bars {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+}
+.comparison-bars li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 55px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: #536158;
+}
+.comparison-track {
+  height: 12px;
+  background: #edf0e8;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.comparison-bar {
+  display: block;
+  height: 100%;
+  background: #829888;
+  border-radius: 2px;
+}
+.comparison-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.comparison-bars .comparison-player {
+  border-top: 1px solid #e3e8df;
+  padding-top: 14px;
+  margin-top: 16px;
+  color: #215f50;
+  font-weight: 700;
+}
+.comparison-player .comparison-bar {
+  background: #24644c;
+}
+.metric-card .comparison-population {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.metric-card .comparison-warning {
+  color: #805923;
+  margin-top: 4px;
 }
 footer {
   border-top: 1px solid #d9dfd8;
@@ -419,6 +509,9 @@ footer > a {
   }
   h1 {
     font-size: 31px;
+  }
+  .position-title {
+    font-size: 25px;
   }
   .period-controls {
     width: 100%;
