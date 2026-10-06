@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures';
 
-for (const position of ['wr', 'rb']) {
+for (const position of ['wr', 'rb', 'te']) {
   test(`${position} charts reflow without page overflow`, async ({ page }, testInfo) => {
     await page.goto(`?position=${position}`);
     const scoring = page.getByTestId('scoring-chart');

@@ -33,7 +33,7 @@ export function SupportingMetrics({
     context: string;
     comparison?: ComparisonMetric;
   }[] =
-    position === "WR"
+    position !== "RB"
       ? [
           {
             label: "Targets per route run",
@@ -136,7 +136,7 @@ export function PlayerDetail({
         </div>
         <p className="sample-size">
           <strong>{agg.games}</strong> games played <span>·</span>{" "}
-          {position === "WR"
+          {position !== "RB"
             ? "— routes run"
             : `${format(total("carriesPerGame"), 0)} carries`}{" "}
           <span>·</span> {format(total("targetsPerGame"), 0)} targets

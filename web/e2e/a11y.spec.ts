@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './fixtures';
 
-for (const position of ['wr', 'rb']) {
+for (const position of ['wr', 'rb', 'te']) {
   for (const period of ['season', 'last4']) {
     test(`${position} ${period} has no serious or critical accessibility violations`, async ({ page }) => {
       await page.goto(`?position=${position}&period=${period}`);

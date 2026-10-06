@@ -74,7 +74,8 @@ def test_missing_game_marks_partial(source_rows, manifest):
 
 
 def test_metadata_timestamp_shared(documents):
-    assert documents["wr"]["meta"]["builtAt"] == documents["rb"]["meta"]["builtAt"]
+    assert len({doc["meta"]["builtAt"] for doc in documents.values()}) == 1
+    assert set(documents) == {"wr", "rb", "te"}
 
 
 def test_post_commit_cleanup_failure(tmp_path, documents, monkeypatch):

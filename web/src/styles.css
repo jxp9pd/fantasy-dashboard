@@ -395,6 +395,7 @@ td {
   border: 1px solid #dce1da;
 }
 .supporting-rb .metric-unavailable,
+.supporting-te .metric-with-comparison,
 .supporting-wr .metric-with-comparison {
   grid-column: 1 / -1;
 }

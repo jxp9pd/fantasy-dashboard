@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   columns,
   format,
+  positionConfig,
   type Period,
   type Player,
   type Position,
@@ -30,7 +31,7 @@ export function LeaderboardTable({
   onClearFilters?: () => void;
 }) {
   const [sort, setSort] = useState({ key: "pointsPerGame", descending: true });
-  const limit = position === "WR" ? 100 : 50;
+  const limit = positionConfig[position].limit;
   const normalize = (name: string) =>
     name
       .normalize("NFD")

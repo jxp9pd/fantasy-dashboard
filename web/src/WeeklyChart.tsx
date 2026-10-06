@@ -35,10 +35,10 @@ export function WeeklyChart({
   );
   const keys = scoring
     ? ["actual", "xfp"]
-    : [position === "WR" ? "targetShare" : "rbCarryShare"];
+    : [position !== "RB" ? "targetShare" : "rbCarryShare"];
   const labels = scoring
     ? ["Actual", "Expected"]
-    : [position === "WR" ? "Target share" : "Share of RB carries"];
+    : [position !== "RB" ? "Target share" : "Share of RB carries"];
   const values = weeks.flatMap((w) =>
     w.status === "played"
       ? keys.map((k) => w.values[k]).filter((v): v is number => v != null)

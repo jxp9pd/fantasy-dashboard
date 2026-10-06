@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { test, expect, positionFixture } from "./fixtures";
 
-for (const position of ["WR", "RB"] as const) {
+for (const position of ["WR", "RB", "TE"] as const) {
   test(`${position} percentile bars follow period and player while retaining the full population`, async ({ page }) => {
     const data = positionFixture(position);
     data.players = Array.from({ length: 6 }, (_, index) => {

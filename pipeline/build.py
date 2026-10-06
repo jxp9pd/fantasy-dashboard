@@ -1,4 +1,4 @@
-"""CLI and transactional publication of a WR/RB snapshot."""
+"""CLI and transactional publication of a WR/RB/TE snapshot."""
 
 import argparse
 import json
@@ -18,7 +18,7 @@ def publish(documents, out):
     snapshots = out.parent.parent / ".data-snapshots"
     snapshots.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=".snapshot-", dir=snapshots))
-    # A versioned directory plus atomic symlink swap publishes both files together.
+    # A versioned directory plus atomic symlink swap publishes all positions together.
     # Existing ordinary directories are migrated with rollback on any rename failure.
     backup = None
     try:

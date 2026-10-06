@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { test, expect, positionFixture } from "./fixtures";
 
-for (const position of ["WR", "RB"] as const) {
+for (const position of ["WR", "RB", "TE"] as const) {
   test(`${position} filters discover outside-top players, combine, clear and work by keyboard and touch`, async ({
     page,
   }, testInfo) => {
@@ -73,7 +73,7 @@ for (const position of ["WR", "RB"] as const) {
     await expect(team).toHaveValue("");
     await expect(rows).toHaveCount(4);
     await expect(
-      page.getByText(`Outside top ${position === "WR" ? 100 : 50} · pinned`),
+      page.getByText(`Outside top ${position === "TE" ? 25 : position === "WR" ? 100 : 50} · pinned`),
     ).toBeVisible();
     await search.fill("Beta");
     await team.selectOption("BAL");

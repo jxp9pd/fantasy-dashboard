@@ -41,6 +41,7 @@ def make_source_rows():
         for pid, pos, pfr, team, status in [
             ("wr", "WR", "w", "A" if week < 5 else "B", "ACT"),
             ("rb", "RB", "r", "A", "ACT"),
+            ("te", "TE", "t", "A", "ACT"),
             ("fb", "FB", "f", "A", "ACT"),
             ("qb", "QB", "q", "A", "ACT"),
             ("other", "WR", "o", "B", "ACT"),

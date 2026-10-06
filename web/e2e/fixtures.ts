@@ -1,8 +1,8 @@
 import { test as base, expect } from '@playwright/test';
 
 // Synthetic test players only. No production data or external service is needed.
-export function positionFixture(position: 'WR' | 'RB') {
-  const names = position === 'WR' ? ['Fixture Alpha Receiver', 'Fixture Beta Receiver', 'Fixture Gamma Receiver'] : ['Fixture Alpha Runner', 'Fixture Beta Runner', 'Fixture Gamma Runner'];
+export function positionFixture(position: 'WR' | 'RB' | 'TE') {
+  const names = position === 'TE' ? ['Fixture Alpha Tight End', 'Fixture Beta Tight End', 'Fixture Gamma Tight End'] : position === 'WR' ? ['Fixture Alpha Receiver', 'Fixture Beta Receiver', 'Fixture Gamma Receiver'] : ['Fixture Alpha Runner', 'Fixture Beta Runner', 'Fixture Gamma Runner'];
   const players = names.map((name, i) => {
     const aggregate = (last4: boolean) => ({
       rank: last4 ? 3 - i : i + 1,
@@ -45,6 +45,7 @@ export const test = base.extend({
     await page.route(/^https?:\/\/(?!127\.0\.0\.1[:/]).*/, route => route.abort());
     await page.route('**/data/wr.json', route => route.fulfill({ json: positionFixture('WR') }));
     await page.route('**/data/rb.json', route => route.fulfill({ json: positionFixture('RB') }));
+    await page.route('**/data/te.json', route => route.fulfill({ json: positionFixture('TE') }));
     await use(page);
   },
 });

@@ -15,7 +15,7 @@ export function seasonBenchmarks(
   const metric =
     kind === "scoring"
       ? "pointsPerGame"
-      : position === "WR"
+      : position !== "RB"
         ? "targetShare"
         : "rbCarryShare";
   const values = players

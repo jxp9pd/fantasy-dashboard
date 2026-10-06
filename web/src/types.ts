@@ -1,4 +1,10 @@
-export type Position = "WR" | "RB";
+export const positions = ["WR", "RB", "TE"] as const;
+export type Position = (typeof positions)[number];
+export const positionConfig: Record<Position, { label: string; limit: number }> = {
+  WR: { label: "Wide receivers", limit: 100 },
+  RB: { label: "Running backs", limit: 50 },
+  TE: { label: "Tight ends", limit: 25 },
+};
 export type Period = "season" | "last4";
 export type Metric = {
   value: number | null;
@@ -72,33 +78,35 @@ const targets: Column = {
   digits: 1,
   help: "Pass attempts with a receiver, excluding sacks, divided by games played.",
 };
+const receivingColumns: Column[] = [
+  ...common,
+  targets,
+  {
+    key: "targetShare",
+    label: "Target share",
+    digits: 1,
+    percent: true,
+    help: "Player targets divided by all team targets in the included games, including plays off the field.",
+  },
+  {
+    key: "routeParticipation",
+    label: "Route %",
+    digits: 1,
+    percent: true,
+    help: routeHelp,
+    unavailable: true,
+  },
+  {
+    key: "yardsPerRoute",
+    label: "Yards/route",
+    digits: 2,
+    help: routeHelp,
+    unavailable: true,
+  },
+];
 export const columns: Record<Position, Column[]> = {
-  WR: [
-    ...common,
-    targets,
-    {
-      key: "targetShare",
-      label: "Target share",
-      digits: 1,
-      percent: true,
-      help: "Player targets divided by all team targets in the included games, including plays off the field.",
-    },
-    {
-      key: "routeParticipation",
-      label: "Route %",
-      digits: 1,
-      percent: true,
-      help: routeHelp,
-      unavailable: true,
-    },
-    {
-      key: "yardsPerRoute",
-      label: "Yards/route",
-      digits: 2,
-      help: routeHelp,
-      unavailable: true,
-    },
-  ],
+  WR: receivingColumns,
+  TE: receivingColumns,
   RB: [
     ...common,
     {

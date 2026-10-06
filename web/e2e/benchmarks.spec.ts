@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { test, expect, positionFixture } from "./fixtures";
 
-for (const position of ["WR", "RB"] as const) {
+for (const position of ["WR", "RB", "TE"] as const) {
   test(`${position} season reference lines stay fixed and fit both chart layouts`, async ({
     page,
   }) => {
@@ -30,7 +30,7 @@ for (const position of ["WR", "RB"] as const) {
     ).toBeVisible();
     await expect(
       role.getByText(
-        `${position}10 · ${position === "WR" ? "15.0" : "60.0"}%`,
+        `${position}10 · ${position !== "RB" ? "15.0" : "60.0"}%`,
         { exact: true },
       ),
     ).toBeVisible();

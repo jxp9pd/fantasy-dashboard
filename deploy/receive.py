@@ -67,12 +67,12 @@ def receive(stream, root):
                     raise ValueError("A referenced dashboard asset is missing")
 
             snapshots = []
-            for position in ("wr", "rb"):
+            for position in ("wr", "rb", "te"):
                 data = json.loads((staging / "data" / f"{position}.json").read_text())
                 if not isinstance(data["players"], list) or data["meta"]["position"] != position.upper():
                     raise ValueError("Invalid position snapshot")
                 snapshots.append(tuple(data["meta"][key] for key in ("season", "builtAt", "dataThroughWeek")))
-            if snapshots[0] != snapshots[1]:
+            if any(snapshot != snapshots[0] for snapshot in snapshots[1:]):
                 raise ValueError("Position snapshots are from different builds")
 
             # Preserve hashed assets for tabs that loaded the previous index.html.

@@ -106,10 +106,10 @@ jobs:
             -o BatchMode=yes -o StrictHostKeyChecking=yes \
             -o ConnectTimeout=15 "fantasy-deploy@$DEPLOY_HOST" \
             < dashboard.tar.gz
-      - name: Verify public dashboard and both position snapshots
+      - name: Verify public dashboard and all position snapshots
         run: |
           set -euo pipefail
-          for path in '' 'metric-notes.html' 'data/wr.json' 'data/rb.json'; do
+          for path in '' 'metric-notes.html' 'data/wr.json' 'data/rb.json' 'data/te.json'; do
             curl --fail --silent --show-error --retry 3 \
               "https://jpentakalos.com/fantasy-dashboard/$path" -o /dev/null
           done

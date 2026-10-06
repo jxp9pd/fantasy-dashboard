@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import { LeaderboardTable } from "./LeaderboardTable";
 import { PlayerDetail } from "./PlayerDetail";
-import type { Period, Position, PositionFile } from "./types";
+import {
+  positions,
+  positionConfig,
+  type Period,
+  type Position,
+  type PositionFile,
+} from "./types";
 function locationState() {
   const params = new URLSearchParams(window.location.search);
+  const requested = params.get("position")?.toUpperCase();
   return {
-    position: (params.get("position")?.toLowerCase() === "rb"
-      ? "RB"
-      : "WR") as Position,
+    position: positions.find((position) => position === requested) ?? "WR",
     period: (params.get("period") === "last4" ? "last4" : "season") as Period,
   };
 }
@@ -92,7 +97,7 @@ export default function App() {
           </a>
         </div>
         <nav aria-label="Positions">
-          {(["WR", "RB"] as Position[]).map((p) => (
+          {positions.map((p) => (
             <a
               key={p}
               href={`?position=${p.toLowerCase()}&period=${period}`}
@@ -102,14 +107,14 @@ export default function App() {
                 navigate({ ...view, position: p });
               }}
             >
-              {p === "WR" ? "Wide receivers" : "Running backs"}
+              {positionConfig[p].label}
             </a>
           ))}
         </nav>
         <div className="title-row">
           <div>
             <h2 className="position-title">
-              {position === "WR" ? "Wide receivers" : "Running backs"}
+              {positionConfig[position].label}
             </h2>
           </div>
           <div

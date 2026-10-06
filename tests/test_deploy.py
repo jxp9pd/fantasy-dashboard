@@ -19,7 +19,7 @@ def payload(extra=None, omit=None, asset="app-first.js"):
         f"assets/{asset}": "console.log('build');",
         "metric-notes.html": "Metric notes",
     }
-    for pos in ("wr", "rb"):
+    for pos in ("wr", "rb", "te"):
         files[f"data/{pos}.json"] = json.dumps({"players": [], "meta": {
             "position": pos.upper(), "season": 2026, "builtAt": "2026-10-06T00:00:00Z", "dataThroughWeek": 4,
         }})
@@ -48,6 +48,7 @@ def test_publishes_complete_release_and_preserves_old_assets(tmp_path):
     assert current.is_symlink() and current.resolve() != first
     assert (current / "data/wr.json").is_file()
     assert (current / "data/rb.json").is_file()
+    assert (current / "data/te.json").is_file()
     assert (current / "assets/app-first.js").is_file()
     assert (current / "assets/app-second.js").is_file()
     assert current.resolve().stat().st_mode & 0o777 == 0o755
@@ -55,13 +56,18 @@ def test_publishes_complete_release_and_preserves_old_assets(tmp_path):
 
 @pytest.mark.parametrize("kwargs", [
     {"omit": "data/rb.json"},
+    {"omit": "data/te.json"},
     {"omit": "assets/app-first.js"},
     {"extra": {"data/rb.json": "not json"}},
+    {"extra": {"data/te.json": "not json"}},
     {"extra": {"../escaped": "bad"}},
     {"extra": {"/absolute": "bad"}},
     {"extra": {".env": "private"}},
     {"extra": {"data/rb.json": json.dumps({"players": [], "meta": {
         "position": "RB", "season": 2025, "builtAt": "different", "dataThroughWeek": 1,
+    }})}},
+    {"extra": {"data/te.json": json.dumps({"players": [], "meta": {
+        "position": "TE", "season": 2025, "builtAt": "different", "dataThroughWeek": 1,
     }})}},
 ])
 def test_invalid_release_keeps_previous_snapshot(tmp_path, kwargs):

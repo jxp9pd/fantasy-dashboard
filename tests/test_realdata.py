@@ -18,7 +18,7 @@ def live():
         pytest.skip("Run the live build first")
     docs = {
         pos: json.loads((root / f"web/public/data/{pos}.json").read_text())
-        for pos in ("wr", "rb")
+        for pos in ("wr", "rb", "te")
     }
     pbp = read_rows(root / "data/raw/play_by_play_2026.parquet")
     return docs, pbp
@@ -27,6 +27,9 @@ def live():
 def test_live_population_and_spine(live):
     docs, _ = live
     assert len(docs["wr"]["players"]) >= 100
+    assert len(docs["te"]["players"]) >= 25
+    populations = [{p["playerId"] for p in docs[pos]["players"]} for pos in ("wr", "rb", "te")]
+    assert sum(map(len, populations)) == len(set.union(*populations))
     for doc in docs.values():
         for p in doc["players"]:
             assert len(p["weeks"]) == 18
@@ -38,6 +41,7 @@ def test_live_top_target_and_carry_reconciliation(live):
     docs, pbp = live
     for pos, metric, predicate, idkey in [
         ("wr", "targetsPerGame", target, "receiver_player_id"),
+        ("te", "targetsPerGame", target, "receiver_player_id"),
         ("rb", "carriesPerGame", carry, "rusher_player_id"),
     ]:
         leaders = sorted(

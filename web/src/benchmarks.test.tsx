@@ -38,7 +38,7 @@ it("omits a reference when fewer than its rank have a valid value", () => {
   expect(seasonBenchmarks(players.slice(0, 9), "WR", "role")).toEqual([]);
 });
 
-it.each(["WR", "RB"] as const)(
+it.each(["WR", "RB", "TE"] as const)(
   "keeps %s benchmark values constant across summary periods",
   (position) => {
     const players = population();
@@ -55,7 +55,7 @@ it.each(["WR", "RB"] as const)(
     expect(scoring().getByText(`${position}10 · 21.1`)).toBeInTheDocument();
     expect(
       role().getByText(
-        `${position}10 · ${position === "WR" ? "15.0" : "30.0"}%`,
+        `${position}10 · ${position !== "RB" ? "15.0" : "30.0"}%`,
       ),
     ).toBeInTheDocument();
     rerender(
@@ -69,7 +69,7 @@ it.each(["WR", "RB"] as const)(
     expect(scoring().getByText(`${position}10 · 21.1`)).toBeInTheDocument();
     expect(
       role().getByText(
-        `${position}20 · ${position === "WR" ? "5.0" : "10.0"}%`,
+        `${position}20 · ${position !== "RB" ? "5.0" : "10.0"}%`,
       ),
     ).toBeInTheDocument();
   },

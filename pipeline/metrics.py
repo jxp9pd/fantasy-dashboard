@@ -237,7 +237,7 @@ def build_documents(rows, manifests, season, built_at=None):
                 stats[(pid, gid)]["inside5"] += 1
                 team_stats[(team, gid)]["teamInside5"] += 1
     documents = {}
-    for position in ("WR", "RB"):
+    for position in ("WR", "RB", "TE"):
         players = []
         for pid, identity in identities.items():
             if (

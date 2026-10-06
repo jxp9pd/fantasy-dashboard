@@ -33,7 +33,7 @@ it("sorts unrounded values, keeps null last, and supports Enter and Space aria-s
   expect(names()[0]).toContain("Player A");
   expect(names()[2]).toContain("Player C");
 });
-it.each(["WR", "RB"] as const)(
+it.each(["WR", "RB", "TE"] as const)(
   "renders exact %s metric column order and unavailable route cells",
   (position) => {
     render(
@@ -50,6 +50,6 @@ it.each(["WR", "RB"] as const)(
         .getAllByRole("button")
         .map((b) => b.textContent?.replace(/ [↓↑↕]$/, "")),
     ).toEqual(columns[position].map((c) => c.label));
-    if (position === "WR") expect(screen.getAllByText("—")).toHaveLength(2);
+    if (position !== "RB") expect(screen.getAllByText("—")).toHaveLength(2);
   },
 );
