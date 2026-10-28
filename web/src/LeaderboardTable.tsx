@@ -3,6 +3,7 @@ import {
   columns,
   format,
   positionConfig,
+  type MinimumFilters,
   type Period,
   type Player,
   type Position,
@@ -15,8 +16,10 @@ export function LeaderboardTable({
   onSelect,
   search = "",
   team = "",
+  minimums = { games: "", volume: "" },
   onSearchChange,
   onTeamChange,
+  onMinimumsChange,
   onClearFilters,
 }: {
   players: Player[];
@@ -26,8 +29,10 @@ export function LeaderboardTable({
   onSelect: (id: string) => void;
   search?: string;
   team?: string;
+  minimums?: MinimumFilters;
   onSearchChange?: (value: string) => void;
   onTeamChange?: (value: string) => void;
+  onMinimumsChange?: (value: MinimumFilters) => void;
   onClearFilters?: () => void;
 }) {
   const [sort, setSort] = useState({ key: "pointsPerGame", descending: true });
@@ -39,7 +44,13 @@ export function LeaderboardTable({
       .replace(/['’‘.]/g, "")
       .toLowerCase();
   const query = normalize(search.trim());
-  const filtersActive = Boolean(query || team);
+  const filtersActive = Boolean(query || team || minimums.games || minimums.volume);
+  const volumeMetric = position === "RB" ? "carriesPerGame" : "targetsPerGame";
+  const updateMinimum = (key: keyof MinimumFilters, value: string) => {
+    if (/^\d*$/.test(value) && Number.isSafeInteger(Number(value))) {
+      onMinimumsChange?.({ ...minimums, [key]: value });
+    }
+  };
   const teams = [
     ...new Set(
       players
@@ -48,12 +59,16 @@ export function LeaderboardTable({
         .concat(team ? [team] : []),
     ),
   ].sort();
-  const population = players.filter((p) =>
-    filtersActive
+  const population = players.filter((p) => {
+    const aggregate = p.periods[period];
+    return filtersActive
       ? (!query || normalize(p.name).includes(query)) &&
-        (!team || p.team === team)
-      : p.periods[period].rank <= limit,
-  );
+          (!team || p.team === team) &&
+          aggregate.games >= Number(minimums.games) &&
+          (!Number(minimums.volume) ||
+            (aggregate.metrics[volumeMetric]?.num ?? 0) >= Number(minimums.volume))
+      : aggregate.rank <= limit;
+  });
   const selected = players.find((p) => p.playerId === selectedId);
   const pinned =
     !filtersActive && selected && !population.includes(selected)
@@ -123,6 +138,36 @@ export function LeaderboardTable({
               ))}
             </select>
           </label>
+          {onMinimumsChange && (
+            <>
+              <label className="minimum-filter">
+                Min. games played
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputMode="numeric"
+                  placeholder="Any"
+                  aria-describedby="minimum-filter-help"
+                  value={minimums.games}
+                  onChange={(e) => updateMinimum("games", e.target.value)}
+                />
+              </label>
+              <label className="minimum-filter">
+                {position === "RB" ? "Min. total carries" : "Min. total targets"}
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputMode="numeric"
+                  placeholder="Any"
+                  aria-describedby="minimum-filter-help"
+                  value={minimums.volume}
+                  onChange={(e) => updateMinimum("volume", e.target.value)}
+                />
+              </label>
+            </>
+          )}
           {filtersActive && (
             <button className="clear-filters" onClick={onClearFilters}>
               Clear filters
@@ -138,6 +183,11 @@ export function LeaderboardTable({
                 ? "player"
                 : "players"}
           </span>
+          {onMinimumsChange && (
+            <p className="minimum-filter-help" id="minimum-filter-help">
+              Minimums use totals in the selected period. Leave blank for any.
+            </p>
+          )}
         </div>
       )}
       <div

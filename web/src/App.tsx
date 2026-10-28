@@ -4,6 +4,7 @@ import { PlayerDetail } from "./PlayerDetail";
 import {
   positions,
   positionConfig,
+  type MinimumFilters,
   type Period,
   type Position,
   type PositionFile,
@@ -24,6 +25,11 @@ export default function App() {
     [selected, setSelected] = useState<Partial<Record<Position, string>>>({});
   const [search, setSearch] = useState("");
   const [team, setTeam] = useState("");
+  const [minimums, setMinimums] = useState<Record<Position, MinimumFilters>>({
+    WR: { games: "", volume: "" },
+    RB: { games: "", volume: "" },
+    TE: { games: "", volume: "" },
+  });
   const { position, period } = view;
   useEffect(() => {
     const handler = () => setView(locationState());
@@ -166,11 +172,19 @@ export default function App() {
                   selectedId={selected[position] ?? ""}
                   search={search}
                   team={team}
+                  minimums={minimums[position]}
                   onSearchChange={setSearch}
                   onTeamChange={setTeam}
+                  onMinimumsChange={(next) =>
+                    setMinimums((current) => ({ ...current, [position]: next }))
+                  }
                   onClearFilters={() => {
                     setSearch("");
                     setTeam("");
+                    setMinimums((current) => ({
+                      ...current,
+                      [position]: { games: "", volume: "" },
+                    }));
                   }}
                   onSelect={(id) =>
                     setSelected((s) => ({ ...s, [position]: id }))

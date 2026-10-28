@@ -6,6 +6,7 @@ export const positionConfig: Record<Position, { label: string; limit: number }> 
   TE: { label: "Tight ends", limit: 25 },
 };
 export type Period = "season" | "last4";
+export type MinimumFilters = { games: string; volume: string };
 export type Metric = {
   value: number | null;
   num?: number;

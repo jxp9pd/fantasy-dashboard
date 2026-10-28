@@ -2,6 +2,35 @@ import AxeBuilder from "@axe-core/playwright";
 import { test, expect, positionFixture } from "./fixtures";
 
 for (const position of ["WR", "RB", "TE"] as const) {
+  test(`${position} minimums filter totals within the selected period`, async ({ page }) => {
+    await page.goto(`?position=${position.toLowerCase()}`);
+    const games = page.getByRole("spinbutton", { name: "Min. games played" });
+    const volume = page.getByRole("spinbutton", {
+      name: position === "RB" ? "Min. total carries" : "Min. total targets",
+    });
+    const rows = page.getByRole("region", { name: "Player leaderboard" }).getByRole("rowheader");
+    await expect(page.getByRole("spinbutton")).toHaveCount(2);
+    await games.fill("5");
+    await volume.fill(position === "RB" ? "85" : "35");
+    await expect(rows).toHaveCount(2);
+    await page.getByRole("button", { name: "Last 4 games", exact: true }).click();
+    await expect(page.getByText("No players match these filters.")).toBeVisible();
+    await games.fill("4");
+    await expect(rows).toHaveCount(2);
+    await page.getByRole("combobox", { name: "Team" }).selectOption("BAL");
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText("Beta");
+    await expect(page.getByText("1 result", { exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth))
+      .toBeLessThanOrEqual(page.viewportSize()!.width);
+    const axe = await new AxeBuilder({ page }).analyze();
+    expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
+    await page.getByRole("button", { name: "Clear filters" }).click();
+    await expect(games).toHaveValue("");
+    await expect(volume).toHaveValue("");
+    await expect(rows).toHaveCount(3);
+  });
+
   test(`${position} filters discover outside-top players, combine, clear and work by keyboard and touch`, async ({
     page,
   }, testInfo) => {
