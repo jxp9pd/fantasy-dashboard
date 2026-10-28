@@ -612,6 +612,15 @@ footer > a {
 .team-filter {
   width: 125px;
 }
+.minimum-filter {
+  width: 140px;
+}
+.minimum-filter-help {
+  flex-basis: 100%;
+  margin: 0;
+  color: #5b685f;
+  font-size: 11px;
+}
 .leaderboard-filters input,
 .leaderboard-filters select {
   width: 100%;
@@ -661,6 +670,9 @@ footer > a {
   }
   .team-filter {
     width: 100px;
+  }
+  .minimum-filter {
+    width: calc((100% - 10px) / 2);
   }
   .filter-count {
     padding: 8px 0;
